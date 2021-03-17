@@ -9,10 +9,6 @@ import (
 
 	"google.golang.org/grpc"
 
-	"google.golang.org/grpc/codes"
-	healthpb "google.golang.org/grpc/health/grpc_health_v1"
-	"google.golang.org/grpc/status"
-
 	rpcstatus "google.golang.org/genproto/googleapis/rpc/status"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
@@ -21,17 +17,6 @@ import (
 	envoy_type "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	"github.com/gogo/googleapis/google/rpc"
 )
-
-type healthServer struct{}
-
-func (s *healthServer) Check(ctx context.Context, in *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {
-	log.Printf("Handling Health request")
-	return &healthpb.HealthCheckResponse{Status: healthpb.HealthCheckResponse_SERVING}, nil
-}
-
-func (s *healthServer) Watch(in *healthpb.HealthCheckRequest, srv healthpb.Health_WatchServer) error {
-	return status.Error(codes.Unimplemented, "Watch is not implemented")
-}
 
 type AuthorizationServer struct{}
 
@@ -94,7 +79,6 @@ func main() {
 	s := grpc.NewServer(opts...)
 
 	auth.RegisterAuthorizationServer(s, &AuthorizationServer{})
-	healthpb.RegisterHealthServer(s, &healthServer{})
 
 	fmt.Printf("Auth running on port 9090")
 	s.Serve(lis)

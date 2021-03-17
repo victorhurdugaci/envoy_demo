@@ -85,16 +85,6 @@ static_resources:
     common_lb_config:
       healthy_panic_threshold:
         value: 50.0   
-    health_checks:
-      - timeout: 1s
-        interval: 5s
-        interval_jitter: 1s
-        no_traffic_interval: 5s
-        unhealthy_threshold: 1
-        healthy_threshold: 3
-        grpc_health_check:
-          service_name: "envoy.service.auth.v3.Authorization"
-          authority: "server.domain.com"
     connect_timeout: 0.25s
 
   - name: rate-limit
@@ -112,14 +102,4 @@ static_resources:
     common_lb_config:
       healthy_panic_threshold:
         value: 50.0   
-    health_checks:
-      - timeout: 1s
-        interval: 5s
-        interval_jitter: 1s
-        no_traffic_interval: 5s
-        unhealthy_threshold: 1
-        healthy_threshold: 3
-        grpc_health_check:
-          service_name: "envoy.service.auth.v3.Authorization"
-          authority: "server.domain.com"
     connect_timeout: 0.25s

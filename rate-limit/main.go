@@ -9,23 +9,8 @@ import (
 
 	"google.golang.org/grpc"
 
-	"google.golang.org/grpc/codes"
-	healthpb "google.golang.org/grpc/health/grpc_health_v1"
-	"google.golang.org/grpc/status"
-
 	ratelimit "github.com/envoyproxy/go-control-plane/envoy/service/ratelimit/v3"
 )
-
-type healthServer struct{}
-
-func (s *healthServer) Check(ctx context.Context, in *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {
-	log.Printf("Handling Health request")
-	return &healthpb.HealthCheckResponse{Status: healthpb.HealthCheckResponse_SERVING}, nil
-}
-
-func (s *healthServer) Watch(in *healthpb.HealthCheckRequest, srv healthpb.Health_WatchServer) error {
-	return status.Error(codes.Unimplemented, "Watch is not implemented")
-}
 
 type RateLimitServer struct {
 	lastCall time.Time
@@ -58,7 +43,6 @@ func main() {
 	s := grpc.NewServer(opts...)
 
 	ratelimit.RegisterRateLimitServiceServer(s, &RateLimitServer{})
-	healthpb.RegisterHealthServer(s, &healthServer{})
 
 	fmt.Printf("Rate limit running on port 9091")
 	s.Serve(lis)
