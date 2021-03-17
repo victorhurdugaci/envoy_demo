@@ -21,12 +21,16 @@ static_resources:
             - name: envoy.filters.http.ratelimit
               typed_config:
                 "@type": type.googleapis.com/envoy.extensions.filters.http.ratelimit.v3.RateLimit
-                domain: my-domain
+                domain: rl
+                request_type: external
+                stage: 0
+                rate_limited_as_resource_exhausted: true
                 failure_mode_deny: true
                 rate_limit_service:
                   grpc_service:
                     envoy_grpc:
                       cluster_name: rate-limit
+                  transport_api_version: V3
             - name: envoy.filters.http.ext_authz
               typed_config:
                 "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
@@ -45,6 +49,10 @@ static_resources:
                   prefix: "/"
                 route:
                   cluster: echo
+                  rate_limits:
+                    - actions:
+                        - source_cluster: {} # This action's value is populated by the "service-cluster" arg passed in when starting Envoy. In this example, it's "proxy" (see docker-compose-example.yml)
+                        - destination_cluster: {}
 
   clusters:
   - name: echo

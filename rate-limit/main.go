@@ -34,12 +34,14 @@ type RateLimitServer struct {
 func (rls *RateLimitServer) ShouldRateLimit(ctx context.Context, req *ratelimit.RateLimitRequest) (*ratelimit.RateLimitResponse, error) {
 	log.Printf("Handling Rate limit check request")
 
-	if rls.lastCall.Add(5 * time.Second).After(time.Now()) {
+	now := time.Now()
+	if rls.lastCall.Add(5 * time.Second).After(now) {
 		return &ratelimit.RateLimitResponse{
 			OverallCode: ratelimit.RateLimitResponse_OVER_LIMIT,
 		}, nil
 	}
 
+	rls.lastCall = now
 	return &ratelimit.RateLimitResponse{
 		OverallCode: ratelimit.RateLimitResponse_OK,
 	}, nil
