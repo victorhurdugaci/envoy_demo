@@ -53,6 +53,12 @@ static_resources:
                     - actions:
                         - source_cluster: {} # This action's value is populated by the "service-cluster" arg passed in when starting Envoy. In this example, it's "proxy" (see docker-compose-example.yml)
                         - destination_cluster: {}
+                        - extension:
+                            name: custom
+                            typed_config:
+                              "@type": type.googleapis.com/envoy.extensions.rate_limit_descriptors.expr.v3.Descriptor
+                              descriptor_key: request.method
+                              text: request.method
 
   clusters:
   - name: echo
