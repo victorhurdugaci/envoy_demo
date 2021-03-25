@@ -63,18 +63,18 @@ static_resources:
   clusters:
   - name: echo
     connect_timeout: 30s
-    type: LOGICAL_DNS
-    # Comment out the following line to test on v6 networks
-    dns_lookup_family: V4_ONLY
-    load_assignment:
-      cluster_name: echo
-      endpoints:
-      - lb_endpoints:
-        - endpoint:
-            address:
-              socket_address:
-                address: host.docker.internal
-                port_value: 8081
+    lb_policy: ROUND_ROBIN
+    type: EDS
+    eds_cluster_config:
+      eds_config:
+        resource_api_version: V3
+        api_config_source:
+          api_type: GRPC
+          refresh_delay: 5s
+          transport_api_version: V3
+          grpc_services:
+            - envoy_grpc:
+                cluster_name: endpoint-discovery
 
   - name: auth
     type: LOGICAL_DNS
@@ -105,6 +105,23 @@ static_resources:
               socket_address:
                 address: host.docker.internal
                 port_value: 9091
+    common_lb_config:
+      healthy_panic_threshold:
+        value: 50.0   
+    connect_timeout: 0.25s
+
+  - name: endpoint-discovery
+    type: LOGICAL_DNS
+    http2_protocol_options: {}
+    load_assignment:
+      cluster_name: endpoint-discovery
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: host.docker.internal
+                port_value: 9092
     common_lb_config:
       healthy_panic_threshold:
         value: 50.0   
